@@ -28,6 +28,15 @@ let channelverif = client.channels.cache.find(c => c.id === verifchannel[message
 //Si le salon existe pas
 if(!verifchannel) return
 
+//Récupérer les lien d'invitations
+const regex = /(discord\.com\/invite\/|discordapp\.com\/invite\/|discord\.gg\/|\.gg\/)([a-zA-Z0-9]+)/gm
+let lienFind = regex.exec(message);
+const result = [];
+while (lienFind){
+result.push(lienFind[0]);
+lienFind = regex.exec(message);
+}
+
 //Construction des boutons
 let buttonVerif = new ActionRowBuilder()
 .addComponents(
@@ -59,7 +68,7 @@ const verifembed = new EmbedBuilder()
 .setColor("51e92a")
 .setFooter({ text: `${message.id}`})
 
-channelverif.send({ embeds: [verifembed], components: [buttonVerif, buttonLien] })
+channelverif.send({ content: `**Lien d'invitation :\n**${result.join("\n")}`, embeds: [verifembed], components: [buttonVerif, buttonLien] })
 }}
 
 }}
