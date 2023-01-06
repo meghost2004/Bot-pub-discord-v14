@@ -28,13 +28,17 @@ let channelverif = client.channels.cache.find(c => c.id === verifchannel[message
 //Si le salon existe pas
 if(!verifchannel) return
 
-//Récupérer les lien d'invitations
-const regex = /(discord\.com\/invite\/|discordapp\.com\/invite\/|discord\.gg\/|\.gg\/)([a-zA-Z0-9]+)/gm
-let lienFind = regex.exec(message);
-const result = [];
-while (lienFind){
-result.push(lienFind[0]);
-lienFind = regex.exec(message);
+const regex = /(https?|ftp|ssh|mailto):\/\/[a-z0-9\/:%_+.,#?!@&=-]+/gi;
+let links = [];
+let match;
+while ((match = regex.exec(message.content)) !== null) {
+links.push(match[0]);
+}
+let linksString;
+if (links.length === 0) {
+linksString = "❌ Aucun lien dans la publicité."
+} else {
+linksString = links.join('\n');
 }
 
 //Construction des boutons
@@ -68,7 +72,7 @@ const verifembed = new EmbedBuilder()
 .setColor("51e92a")
 .setFooter({ text: `${message.id}`})
 
-channelverif.send({ content: `**Lien d'invitation :\n**${result.join("\n")}`, embeds: [verifembed], components: [buttonVerif, buttonLien] })
+channelverif.send({ content: `**Lien :\n**${linksString}`, embeds: [verifembed], components: [buttonVerif, buttonLien] })
 }}
 
 }}
