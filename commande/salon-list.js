@@ -2,28 +2,26 @@ const { EmbedBuilder } = require('discord.js');
 const path = require('path');
 
 module.exports = {
-name: 'salon-list',
-run: async (message, args, client) => {
+  name: 'salon-list',
+  run: async (message, args, client) => {
+    if (!message.member.permissions.has('ManageChannels')) {
+    return message.channel.send(`**${message.author.tag}**, Vous n'avez pas les permissions requises. (Gérer les salons)`);
+    }
 
-if(!message.member.permissions.has("ManageChannels")) {
-return message.channel.send(`**${message.author.tag}**, Vous avez pas les permissions requises. (Gérer les salons)`)
-}
+    const channels = require(path.resolve(path.join('./database/config SalonPub.json')));
+    if (!channels) return message.channel.send(`❌・Aucun salon publicitaire n'est défini sur le serveur.`);
 
-let allchannel = '__Voici la liste des salons publicitaire du serveur.__\n';
+    const channelIds = Object.keys(channels[message.guild.id]);
+    if (!channelIds.length) return message.channel.send(`❌・Aucun salon publicitaire n'est défini sur le serveur.`);
 
-const channels = require(path.resolve(path.join('./database/config SalonPub.json')));
+    const allchannel = `__Voici la liste des salons publicitaire du serveur.__\n${'\n'.repeat(channelIds.length - 1)}\n> ${channelIds.map(channel => `<#${channel}>, **ID**: ${channel}`).join('\n> ')}`;
 
-for(channel in channels[message.guild.id]){
-allchannel = allchannel + `\n> <#${channel}>, **ID**: ${channel}`;
-}
-
-const SalonList = new EmbedBuilder()
-.setTitle('📢 Salon publicitaire')
-
-.setDescription(allchannel)
-.setFooter({ text: `${client.user.username}`})
-.setColor(client.config.couleurs.defaut)
-message.channel.send({ embeds: [SalonList] })
-
-    
-}}
+    const SalonList = new EmbedBuilder()
+      .setTitle('📢 Salon publicitaire')
+      .setDescription(allchannel)
+      .setFooter({ text: `${client.user.username}` })
+      .setColor(client.config.couleurs.defaut)
+      .setTimestamp();
+    message.channel.send({ embeds: [SalonList] });
+  },
+};
